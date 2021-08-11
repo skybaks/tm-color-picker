@@ -1,0 +1,10 @@
+[meta]
+name = "Color Picker"
+author = "skybaxrider"
+category = "Utilities"
+blocks = [ "Plugin_ColorPicker" ]
+siteid = 70
+version = "1.2"
+
+[script]
+imports = [ "Icons.as" ]
