@@ -3,6 +3,7 @@ vec3 pickedColor1 = vec3(1.0, 1.0, 1.0);
 vec3 pickedColor2 = vec3(1.0, 1.0, 1.0);
 string templateText = "Your Text Here";
 bool windowVisible = false;
+ColorPicker::SymbolTable@ g_symbolTable = ColorPicker::SymbolTable();
 
 string GradientCodedText(vec3 startColor, vec3 endColor, string text)
 {
@@ -80,11 +81,18 @@ void RenderInterface()
 {
     if (windowVisible)
     {
-        UI::SetNextWindowSize(600, 400);
+        UI::SetNextWindowSize(1100, 750);
         UI::Begin("Color Picker", windowVisible);
 
         templateText = UI::InputText("Input Text", templateText);
         UI::Separator();
+
+        if (UI::CollapsingHeader("Symbol Table"))
+        {
+            g_symbolTable.RenderInterface();
+            templateText += g_symbolTable.GetSelectedSymbol();
+            UI::Separator();
+        }
 
         UI::PushID("Color1");
         UI::Text("\\$0f0Single Color\\$fff\n"
