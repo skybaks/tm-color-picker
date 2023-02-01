@@ -65,7 +65,7 @@ namespace ColorPicker
             return symbol;
         }
 
-        private void SetSelectedSymbol(string value)
+        private void SetSelectedSymbol(const string&in value)
         {
             if (m_selectedSymbol == "")
             {

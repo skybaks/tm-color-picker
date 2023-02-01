@@ -5,7 +5,7 @@ string templateText = "Your Text Here";
 bool windowVisible = false;
 ColorPicker::SymbolTable@ g_symbolTable = ColorPicker::SymbolTable();
 
-string GradientCodedText(vec3 startColor, vec3 endColor, string text)
+string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text)
 {
     string result = "";
     int letterCount = text.Replace(" ", "").Replace("\t", "").Length - 1;
