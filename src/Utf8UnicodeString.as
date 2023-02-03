@@ -11,9 +11,20 @@ namespace ColorPicker
         private uint m_lastIndexPos;
         private uint m_lastIndexCount;
 
+        Utf8UnicodeString()
+        {
+            m_string = "";
+            m_length = 0;
+            m_lastIndexPos = 0;
+            m_lastIndexCount = 0;
+        }
+
         Utf8UnicodeString(const string&in str)
         {
             m_string = str;
+            m_length = 0;
+            m_lastIndexPos = 0;
+            m_lastIndexCount = 0;
             CalculateLength();
         }
 
@@ -75,6 +86,15 @@ namespace ColorPicker
         string ToString()
         {
             return m_string;
+        }
+
+        Utf8UnicodeString@ opAssign(const string&in value)
+        {
+            m_string = value;
+            CalculateLength();
+            m_lastIndexPos = 0;
+            m_lastIndexCount = 0;
+            return this;
         }
 
         void Append(const string&in value)
