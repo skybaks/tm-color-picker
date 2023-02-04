@@ -87,12 +87,6 @@ void RenderInterface()
         g_templateText = UI::InputText("Input Text", g_templateText);
         UI::Separator();
 
-        if (UI::CollapsingHeader("Symbols"))
-        {
-            g_symbolTable.RenderInterface();
-            UI::Separator();
-        }
-
         UI::PushID("Color1");
         UI::Text("\\$0f0Single Color\\$fff\n"
             + "Sets the input text to a single color.");
@@ -154,6 +148,12 @@ void RenderInterface()
         UI::Text("Preview:\t" + g_gradientText.Replace("$", "\\$"));
 
         UI::PopID();
+
+        if (UI::CollapsingHeader("Symbols"))
+        {
+            g_symbolTable.RenderInterface();
+            UI::Separator();
+        }
 
         UI::End();
     }
