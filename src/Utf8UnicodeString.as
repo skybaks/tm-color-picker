@@ -36,7 +36,7 @@ namespace ColorPicker
             }
 
             string value = "";
-            uint pos = GetIndexPos(index);
+            uint pos = GetIndexPosition(index);
             uint byteCount = GetByteCount(m_string[pos]);
             if (byteCount > 0)
             {
@@ -63,7 +63,7 @@ namespace ColorPicker
                 throw("Invalid amount of bytes for assignment");
             }
 
-            uint pos = GetIndexPos(index);
+            uint pos = GetIndexPosition(index);
             uint currentByteCount = GetByteCount(m_string[pos]);
             if (uint(value.Length) == currentByteCount)
             {
@@ -103,6 +103,25 @@ namespace ColorPicker
             CalculateLength();
         }
 
+        string Pop(uint size)
+        {
+            if (size > m_length)
+            {
+                throw("Size out of range");
+            }
+
+            uint pos = GetIndexPosition(size);
+
+            string popped = m_string.SubStr(0, pos);
+            m_string = m_string.SubStr(pos, m_string.Length - pos);
+
+            CalculateLength();
+            m_lastIndexCount = 0;
+            m_lastIndexPos = 0;
+
+            return popped;
+        }
+
         void Insert(uint index, const string&in value)
         {
             if (index > m_length)
@@ -118,8 +137,10 @@ namespace ColorPicker
             }
             else
             {
-                uint pos = GetIndexPos(index);
-                m_string = m_string.SubStr(0, pos) + value + m_string.SubStr(pos, m_string.Length - pos);
+                uint pos = GetIndexPosition(index);
+                string stringPart1 = m_string.SubStr(0, pos);
+                string stringPart2 = m_string.SubStr(pos, m_string.Length - pos);
+                m_string = stringPart1 + value + stringPart2;
             }
 
             CalculateLength();
@@ -131,11 +152,11 @@ namespace ColorPicker
             while(search < m_string.Length)
             {
                 m_length += 1;
-                search = GetNextIndex(search);
+                search = GetNextCharacterIndex(search);
             }
         }
 
-        private uint GetIndexPos(uint index)
+        uint GetIndexPosition(uint index)
         {
             uint pos = 0;
             uint count = 0;
@@ -148,7 +169,7 @@ namespace ColorPicker
             while (count < index)
             {
                 count += 1;
-                pos = GetNextIndex(pos);
+                pos = GetNextCharacterIndex(pos);
             }
 
             m_lastIndexPos = pos;
@@ -157,7 +178,7 @@ namespace ColorPicker
             return pos;
         }
 
-        private uint GetNextIndex(uint start)
+        uint GetNextCharacterIndex(uint start)
         {
             if (start < 0 || start > uint(m_string.Length))
             {

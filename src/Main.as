@@ -87,10 +87,9 @@ void RenderInterface()
         g_templateText = UI::InputText("Input Text", g_templateText);
         UI::Separator();
 
-        if (UI::CollapsingHeader("Symbol Table"))
+        if (UI::CollapsingHeader("Symbols"))
         {
             g_symbolTable.RenderInterface();
-            g_templateText += g_symbolTable.GetSelectedSymbol();
             UI::Separator();
         }
 
