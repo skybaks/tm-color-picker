@@ -1,75 +1,65 @@
 
 namespace ColorPicker
 {
+    // Source: https://openplanet.dev/symbols
+    Utf8UnicodeString g_symbolsEmojiAndStandard = "€ Ƀ ™ Ⓜ Ⓟ △ ⬜ ♢ ○ ◉ ◎ ✂ ✄ ✔ ✖ ✅ ✘ ❌ ♠ ♥ ♦ ♣ ♤ ♡ ♢ ♧ ≈ ∅ π — ‘ ’ “ ” † ‡ • … ‽ ⁂ № • ⏎ ⌫ ★ ☆ ☐ ☑ ☒ ☛ ☞ ✓ ✗ 〃 ⎘ ☍ ⎀ ⏰ ⏱ ⏲ ⏳ ⏴ ⏵ ⏶ ⏷ ⏸ ⏹ ⏺ 🔁 ☺ ⌨ ✎ ✍ ✉ ← ↑ → ↓ ↔ ↕ ⇄ ⇅ ↲ ↳ ↰ ↱ ↱ ⇤ ⇥ ↶ ↷ ↻ ⟳ ⟲ ➔ ↯ ↖ ➘ ➙ ➚ ➟ ⇠ ➤ ⇦ ⇨ ► ◀ ▲ ▼ ▷ ◁ △ ▽ ➴ ● 🔥 🔧 🔗 🕑 ♫ ♪ 🔊 💡 ❄ ⚑ 🔒 🔓 🔎 🎧 🌐 🎥 💾 🎮 🏃 🏆 🏁 💢 💿 📷 🔍 🔨 🔀 🔂 🔑 📎 👤 👥 🔔 🔕";
+    Utf8UnicodeString g_symbolsFontAwesome47 = "                                                                                                                                                                                                                                                                                                                                                                    ";
+    Utf8UnicodeString g_symbolsKenneyIcons = "                                                                                                                                                                        ";
+
     class SymbolTable
     {
-        private string m_selectedSymbol = "";
-        // Source: https://openplanet.nl/symbols
-        private string[] m_symbols = {
-            "£", "€", "$", "¥", "Ƀ", "¢", "¤", "©", "®", "™", "Ⓜ", "Ⓟ", "△", "⬜", "♢", "○", "◉", "◎", "✂", "✄", "✔", "✖", "✅", "✘", "❌", "♠", "♥", "♦", "♣", "♤", "♡", "♢", "♧", "≈", "∅", "°", "µ", "π", "§", "¶", "·", "—", "‘", "’", "“", "”", "†", "‡", "•", "…", "‽", "⁂", "№", "•", "·", "⏎", "⌫",
-            "★", "☆", "☐", "☑", "☒", "☛", "☞", "✓", "✗", "〃", "⎘", "☍", "⎀", "✂", "⏰", "⏱", "⏲", "⏳", "⏴", "⏵", "⏶", "⏷", "⏸", "⏹", "⏺", "🔁", "☺", "⌨", "✎", "✍", "✉", "←", "↑", "→", "↓", "↔", "↕", "⇄", "⇅", "↲", "↳", "↰", "↱", "↱", "⇤", "⇥",
-            "↶", "↷", "↻", "⟳", "⟲", "➔", "↯", "↖", "➘", "➙", "➚", "➟", "⇠", "➤", "⇦", "⇨", "⇨", "«", "»", "►", "◀", "▲", "▼", "▷", "◁", "△", "▽", "➴", "●", "⏳", "★", "☆", "🔥", "🔧", "🔗", "🕑", "♫", "♪", "🔊", "💡", "❄", "⚑", "🔒", "🔓", "🔎", "🎧",
-            "🌐", "🎥", "💾", "🎮", "🏃", "🏆", "🏆", "🏁", "💢", "💿", "📷", "🔍", "🔧", "🔨", "🔀", "🔀", "🔂", "🔂", "🔑", "📎", "👤", "👥", "🔔", "🔕", 
+        private string[] m_symbolStrings = { "", "", "" };
+        private string[] m_symbolNames = { "Emojis & standard symbols", "Font Awesome 4.7", "Kenney Icons" };
+        private float m_lastContentWidth = 0.0f;
 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
-        };
-        private float m_colWidth = 25.0f;
+        SymbolTable()
+        {
+        }
 
         void RenderInterface()
         {
-            float windowWidth = UI::GetWindowSize().x;
-            int colCount = int(Math::Max(Math::Min(Math::Floor(windowWidth / m_colWidth), 64.0f), 0.0f));
-            if (UI::BeginTable("SymbolTable", colCount))
+            vec2 inputSize = UI::GetContentRegionAvail();
+            inputSize.y = 0.0f;
+            if (inputSize.x != m_lastContentWidth)
             {
-                int currColCount = 0;
-                for (uint i = 0; i < m_symbols.Length; i++)
-                {
-                    UI::TableNextColumn();
-                    if (UI::Selectable(m_symbols[i], false))
-                    {
-                        SetSelectedSymbol(m_symbols[i]);
-                    }
-                    if (currColCount < (colCount - 1))
-                    {
-                        currColCount++;
-                    }
-                    else
-                    {
-                        currColCount = 0;
-                        UI::TableNextRow();
-                    }
-                }
-                UI::EndTable();
+                UpdateLineWrapPositions(inputSize.x);
+            }
+            m_lastContentWidth = inputSize.x;
+
+            for (uint i = 0; i < m_symbolStrings.Length; ++i)
+            {
+                UI::Text(m_symbolNames[i]);
+                UI::InputTextMultiline("##" + tostring(i), m_symbolStrings[i], inputSize);
             }
         }
 
-        string GetSelectedSymbol()
+        private void UpdateLineWrapPositions(float regionWidth)
         {
-            string symbol = m_selectedSymbol;
-            m_selectedSymbol = "";
-            return symbol;
-        }
+            Utf8UnicodeString[] unsplitStrings = {
+                tostring(g_symbolsEmojiAndStandard),
+                tostring(g_symbolsFontAwesome47),
+                tostring(g_symbolsKenneyIcons)
+            };
+            vec2 framePad = UI::GetStyleVarVec2(UI::StyleVar::FramePadding);
+            float wrapLen = regionWidth - (framePad.x * 2.0f);
 
-        private void SetSelectedSymbol(const string&in value)
-        {
-            if (m_selectedSymbol == "")
+            for (uint symbolIndex = 0; symbolIndex < m_symbolStrings.Length; ++symbolIndex)
             {
-                m_selectedSymbol = value;
+                m_symbolStrings[symbolIndex] = "";
+                uint wrapPos = 0;
+                while (wrapPos < unsplitStrings[symbolIndex].Length)
+                {
+                    wrapPos = UI::CalcWordWrapPosition(2.05f, tostring(unsplitStrings[symbolIndex]), wrapLen);
+                    if (wrapPos > 4)
+                    {
+                        uint nextIndex = unsplitStrings[symbolIndex].GetNextCharacterIndex(wrapPos - 4);
+                        m_symbolStrings[symbolIndex] += unsplitStrings[symbolIndex].Pop(nextIndex) + "\n";
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
             }
         }
     }
