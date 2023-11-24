@@ -34,10 +34,10 @@ string N_GradientCodedText(array<vec3>@ colors, const string&in text)
     int letterCount = unicode.Length - 1;
     if (letterCount <= 0)
     {
-        return text;
+        return "$" + Hex3ColorCode(colors[0]) + text;
     }
-    string result = "";
     int segmentLength = letterCount / Math::Max(1, colors.Length - 1);
+    string result = "";
     string lastColorCode = "";
     for (uint i = 0; i < colors.Length - 1; ++i)
     {
@@ -59,12 +59,11 @@ string N_GradientCodedText(array<vec3>@ colors, const string&in text)
 
 string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text, const string&in initLastColorCode = "")
 {
-    string result = "";
     ColorPicker::Utf8UnicodeString unicode = text;
     int letterCount = unicode.Length - 1;
     if (letterCount <= 0)
     {
-        return result;
+        return "$" + Hex3ColorCode(startColor) + text;
     }
     if (initLastColorCode != "") { letterCount += 1; }
     float xStep = (endColor.x - startColor.x) / letterCount;
@@ -74,6 +73,7 @@ string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text, c
     int currentLetter = 0;
     if (initLastColorCode != "") { currentLetter += 1; }
     string lastColorCode = initLastColorCode;
+    string result = "";
     for (uint i = 0; i < unicode.Length; ++i)
     {
         string letter = unicode[i];
