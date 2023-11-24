@@ -5,7 +5,9 @@
 			"type": "Openplanet Remote Build",
 			"pluginId": "ColorPicker",
 			"openplanetPort": 30000,
-			"problemMatcher": [],
+			"problemMatcher": [
+				"$Openplanet Remote Build Problem Matcher: Angelscript Compiler"
+			],
 			"label": "Openplanet Remote Build: Load/Reload from User Folder",
 			"group": {
 				"kind": "build",
