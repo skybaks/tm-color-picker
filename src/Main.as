@@ -7,7 +7,45 @@ string g_gradientText = "";
 bool windowVisible = false;
 ColorPicker::SymbolTable@ g_symbolTable = ColorPicker::SymbolTable();
 
-string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text)
+string N_GradientCodedText(array<vec3>@ colors, const string&in text)
+{
+    if (colors.Length <= 0)
+    {
+        return text;
+    }
+    else if (colors.Length == 1)
+    {
+        return "$" + Hex3ColorCode(colors[0]) + text;
+    }
+
+    ColorPicker::Utf8UnicodeString unicode = text;
+    int letterCount = unicode.Length - 1;
+    if (letterCount <= 0)
+    {
+        return text;
+    }
+    string result = "";
+    int segmentLength = letterCount / Math::Max(1, colors.Length - 1);
+    string lastColorCode = "";
+    for (uint i = 0; i < colors.Length - 1; ++i)
+    {
+        string inputString = "";
+        if (i < colors.Length - 2)
+        {
+            inputString = unicode.Pop(segmentLength);
+        }
+        else
+        {
+            inputString = unicode.ToString();
+        }
+        result += GradientCodedText(colors[i], colors[i + 1], inputString, lastColorCode);
+        lastColorCode = Hex3ColorCode(colors[i]);
+    }
+
+    return result;
+}
+
+string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text, const string&in initLastColorCode = "")
 {
     string result = "";
     ColorPicker::Utf8UnicodeString unicode = text;
@@ -16,12 +54,14 @@ string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text)
     {
         return result;
     }
+    if (initLastColorCode != "") { letterCount += 1; }
     float xStep = (endColor.x - startColor.x) / letterCount;
     float yStep = (endColor.y - startColor.y) / letterCount;
     float zStep = (endColor.z - startColor.z) / letterCount;
 
     int currentLetter = 0;
-    string lastColorCode = "";
+    if (initLastColorCode != "") { currentLetter += 1; }
+    string lastColorCode = initLastColorCode;
     for (uint i = 0; i < unicode.Length; ++i)
     {
         string letter = unicode[i];
@@ -45,6 +85,11 @@ string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text)
     }
 
     return result;
+}
+
+string Hex3ColorCode(const vec3&in color)
+{
+    return DecimalToHex3(color.x) + DecimalToHex3(color.y) + DecimalToHex3(color.z);
 }
 
 string DecimalToHex3(float decimal)

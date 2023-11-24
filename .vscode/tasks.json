@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "Openplanet Remote Build",
+			"pluginId": "ColorPicker",
+			"openplanetPort": 30000,
+			"problemMatcher": [],
+			"label": "Openplanet Remote Build: Load/Reload from User Folder",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
