@@ -141,7 +141,9 @@ void RenderInterface()
         UI::SetNextWindowSize(1100, 750);
         UI::Begin("Color Picker", g_windowVisible);
 
-        string newTemplateText = UI::InputText("Input Text", g_templateText);
+        UI::Text("Input Text:");
+        UI::SameLine();
+        string newTemplateText = UI::InputText("##InputText", g_templateText);
         if (newTemplateText != g_templateText) { g_triggerRefresh = true; }
         g_templateText = newTemplateText;
         UI::Separator();
