@@ -1,27 +1,87 @@
 
-vec3 g_pickedColor1 = vec3(1.0, 1.0, 1.0);
-vec3 g_pickedColor2 = vec3(1.0, 1.0, 1.0);
+class ColorCodeData
+{
+    vec3 Color;
+    string Code;
+
+    ColorCodeData(const vec3&in color, const string&in code)
+    {
+        Color = color;
+        Code = code;
+    }
+}
+
+array<ColorCodeData@> g_pickedColors = {};
 string g_templateText = "Your Text Here";
 string g_gradientText = "";
+bool g_triggerRefresh = true;
+bool g_windowVisible = false;
 
-bool windowVisible = false;
 ColorPicker::SymbolTable@ g_symbolTable = ColorPicker::SymbolTable();
 
-string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text)
+string N_GradientCodedText(array<vec3>@ colors, const string&in text)
 {
-    string result = "";
+    if (colors.Length <= 0)
+    {
+        return text;
+    }
+    else if (colors.Length == 1)
+    {
+        return "$" + Hex3ColorCode(colors[0]) + text;
+    }
+
     ColorPicker::Utf8UnicodeString unicode = text;
     int letterCount = unicode.Length - 1;
     if (letterCount <= 0)
     {
-        return result;
+        return "$" + Hex3ColorCode(colors[0]) + text;
     }
+    int segmentLength = Math::Max(1, letterCount / Math::Max(1, colors.Length - 1));
+    string result = "";
+    string lastColorCode = "";
+    for (uint i = 0; i < colors.Length - 1; ++i)
+    {
+        string inputString = "";
+        if (i < colors.Length - 2)
+        {
+            inputString = unicode.Pop(segmentLength);
+        }
+        else
+        {
+            inputString = unicode.ToString();
+        }
+        result += GradientCodedText(colors[i], colors[i + 1], inputString, lastColorCode);
+        lastColorCode = Hex3ColorCode(colors[i]);
+    }
+
+    return result;
+}
+
+string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text, const string&in initLastColorCode = "")
+{
+    ColorPicker::Utf8UnicodeString unicode = text;
+    int letterCount = unicode.Length - 1;
+    if (letterCount <= 0)
+    {
+        string code = Hex3ColorCode(startColor);
+        if (letterCount == 0 && code != initLastColorCode)
+        {
+            return "$" + code + text;
+        }
+        else
+        {
+            return text;
+        }
+    }
+    if (initLastColorCode != "") { letterCount += 1; }
     float xStep = (endColor.x - startColor.x) / letterCount;
     float yStep = (endColor.y - startColor.y) / letterCount;
     float zStep = (endColor.z - startColor.z) / letterCount;
 
     int currentLetter = 0;
-    string lastColorCode = "";
+    if (initLastColorCode != "") { currentLetter += 1; }
+    string lastColorCode = initLastColorCode;
+    string result = "";
     for (uint i = 0; i < unicode.Length; ++i)
     {
         string letter = unicode[i];
@@ -45,6 +105,11 @@ string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text)
     }
 
     return result;
+}
+
+string Hex3ColorCode(const vec3&in color)
+{
+    return DecimalToHex3(color.x) + DecimalToHex3(color.y) + DecimalToHex3(color.z);
 }
 
 string DecimalToHex3(float decimal)
@@ -72,87 +137,69 @@ string DecimalToHex3(float decimal)
 
 void RenderMenu()
 {
-    if (UI::MenuItem("\\$fa6" + Icons::PaintBrush + "\\$z Color Picker", "", windowVisible)) {
-        windowVisible = !windowVisible;
+    if (UI::MenuItem("\\$fa6" + Icons::PaintBrush + "\\$z Color Picker", "", g_windowVisible)) {
+        g_windowVisible = !g_windowVisible;
     }
 }
 
 void RenderInterface()
 {
-    if (windowVisible)
+    if (g_windowVisible)
     {
         UI::SetNextWindowSize(1100, 750);
-        UI::Begin("Color Picker", windowVisible);
+        UI::Begin("Color Picker", g_windowVisible);
 
-        g_templateText = UI::InputText("Input Text", g_templateText);
+        UI::Text("Input Text:");
+        UI::SameLine();
+        string newTemplateText = UI::InputText("##InputText", g_templateText);
+        if (newTemplateText != g_templateText) { g_triggerRefresh = true; }
+        g_templateText = newTemplateText;
         UI::Separator();
 
-        UI::PushID("Color1");
-        UI::Text("\\$0f0Single Color\\$fff\n"
-            + "Sets the input text to a single color.");
-        g_pickedColor1 = UI::InputColor3("Pick Color", g_pickedColor1);
-        string colorCode1 =
-            DecimalToHex3(g_pickedColor1.x)
-            + DecimalToHex3(g_pickedColor1.y)
-            + DecimalToHex3(g_pickedColor1.z);
-        string colorCodeText1 = "$" + colorCode1;
-        UI::PushID("Color1CopyCode");
-        if (UI::Button("Copy"))
+        if (UI::Button("Add Color"))
         {
-            IO::SetClipboard(colorCodeText1);
+            g_pickedColors.InsertLast(ColorCodeData(vec3(1.0, 1.0, 1.0), ""));
+            g_triggerRefresh = true;
         }
         UI::SameLine();
-        UI::InputText("Color Code", colorCodeText1);
-        UI::PopID();
-        string codedText1 = colorCodeText1 + g_templateText;
-        UI::PushID("Color1CopyText");
-        if (UI::Button("Copy"))
+        UI::BeginDisabled(g_pickedColors.Length <= 1);
+        if (UI::Button("Remove Color"))
         {
-            IO::SetClipboard(codedText1);
+            if (g_pickedColors.Length > 1)
+            {
+                g_pickedColors.RemoveAt(g_pickedColors.Length - 1);
+            }
+            g_triggerRefresh = true;
         }
-        UI::SameLine();
-        UI::InputText("Coded Text", codedText1);
-        UI::PopID();
-        UI::Text("Preview:\t" + codedText1.Replace("$", "\\$"));
-        UI::PopID();
+        UI::EndDisabled();
 
-        UI::Separator();
-
-        UI::PushID("Color2");
-        UI::Text("\\$fffT\\$efew\\$dfdo "
-            + "\\$cfcC\\$bfbo\\$afal\\$9f9o\\$8f8r "
-            + "\\$7f7G\\$6f6r\\$5f5a\\$4f4d\\$3f3i\\$2f2e\\$1f1n\\$0f0t\\$fff\n"
-            + "Sets the input text to a gradient between the first and second color.");
-        g_pickedColor2 = UI::InputColor3("Pick Color", g_pickedColor2);
-        string colorCode2 =
-            DecimalToHex3(g_pickedColor2.x)
-            + DecimalToHex3(g_pickedColor2.y)
-            + DecimalToHex3(g_pickedColor2.z);
-        string colorCodeText2 = "$" + colorCode2;
-        UI::PushID("Color2CopyCode");
-        if (UI::Button("Copy"))
+        for (uint i = 0; i < g_pickedColors.Length; ++i)
         {
-            IO::SetClipboard(colorCodeText2);
+            vec3 newColor = UI::InputColor3("Pick Color##" + tostring(i), g_pickedColors[i].Color);
+            if (newColor != g_pickedColors[i].Color) { g_triggerRefresh = true; }
+            g_pickedColors[i].Color = newColor;
+            UI::SameLine();
+            if (UI::Button("Copy##" + tostring(i)))
+            {
+                IO::SetClipboard(g_pickedColors[i].Code);
+            }
+            UI::SameLine();
+            UI::InputText("##" + tostring(i), g_pickedColors[i].Code);
         }
-        UI::SameLine();
-        UI::InputText("Color Code", colorCodeText2);
-        UI::PopID();
-        UI::PushID("Color2CopyText");
-        if (UI::Button("Copy"))
+
+        if (UI::Button("Copy##CodedText"))
         {
             IO::SetClipboard(g_gradientText);
         }
         UI::SameLine();
-        UI::InputText("Coded Text", g_gradientText);
-        UI::PopID();
+        UI::InputText("##CodedText", g_gradientText);
         UI::Text("Preview:\t" + g_gradientText.Replace("$", "\\$"));
 
-        UI::PopID();
+        UI::Separator();
 
         if (UI::CollapsingHeader("Symbols"))
         {
             g_symbolTable.RenderInterface();
-            UI::Separator();
         }
 
         UI::End();
@@ -161,23 +208,22 @@ void RenderInterface()
 
 void Main()
 {
-    string lastTemplateText = "";
-    vec3 lastColor1 = vec3(0.0, 0.0, 0.0);
-    vec3 lastColor2 = vec3(0.0, 0.0, 0.0);
+    g_pickedColors.InsertLast(ColorCodeData(vec3(1.0, 1.0, 1.0), ""));
 
     while (true)
     {
-        sleep(10);
+        sleep(100);
 
-        if (lastTemplateText != g_templateText
-            || lastColor1.x != g_pickedColor1.x || lastColor1.y != g_pickedColor1.y || lastColor1.z != g_pickedColor1.z
-            || lastColor2.x != g_pickedColor2.x || lastColor2.y != g_pickedColor2.y || lastColor2.z != g_pickedColor2.z)
+        if (g_triggerRefresh)
         {
-            g_gradientText = GradientCodedText(g_pickedColor1, g_pickedColor2, g_templateText);
+            g_triggerRefresh = false;
+            array<vec3> colors = {};
+            for (uint i = 0; i < g_pickedColors.Length; ++i)
+            {
+                colors.InsertLast(g_pickedColors[i].Color);
+                g_pickedColors[i].Code = "$" + Hex3ColorCode(g_pickedColors[i].Color);
+            }
+            g_gradientText = N_GradientCodedText(colors, g_templateText);
         }
-
-        lastTemplateText = g_templateText;
-        lastColor1 = g_pickedColor1;
-        lastColor2 = g_pickedColor2;
     }
 }
