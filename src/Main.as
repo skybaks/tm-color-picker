@@ -36,7 +36,7 @@ string N_GradientCodedText(array<vec3>@ colors, const string&in text)
     {
         return "$" + Hex3ColorCode(colors[0]) + text;
     }
-    int segmentLength = letterCount / Math::Max(1, colors.Length - 1);
+    int segmentLength = Math::Max(1, letterCount / Math::Max(1, colors.Length - 1));
     string result = "";
     string lastColorCode = "";
     for (uint i = 0; i < colors.Length - 1; ++i)
@@ -63,7 +63,15 @@ string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text, c
     int letterCount = unicode.Length - 1;
     if (letterCount <= 0)
     {
-        return "$" + Hex3ColorCode(startColor) + text;
+        string code = Hex3ColorCode(startColor);
+        if (code != initLastColorCode)
+        {
+            return "$" + code + text;
+        }
+        else
+        {
+            return text;
+        }
     }
     if (initLastColorCode != "") { letterCount += 1; }
     float xStep = (endColor.x - startColor.x) / letterCount;
@@ -188,7 +196,10 @@ void RenderInterface()
 
         UI::Separator();
 
-        g_symbolTable.RenderInterface();
+        if (UI::CollapsingHeader("Symbols"))
+        {
+            g_symbolTable.RenderInterface();
+        }
 
         UI::End();
     }
