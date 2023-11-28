@@ -156,19 +156,6 @@ void RenderInterface()
         g_templateText = newTemplateText;
         UI::Separator();
 
-        for (uint i = 0; i < g_pickedColors.Length; ++i)
-        {
-            vec3 newColor = UI::InputColor3("Pick Color##" + tostring(i), g_pickedColors[i].Color);
-            if (newColor != g_pickedColors[i].Color) { g_triggerRefresh = true; }
-            g_pickedColors[i].Color = newColor;
-            UI::SameLine();
-            if (UI::Button("Copy##" + tostring(i)))
-            {
-                IO::SetClipboard(g_pickedColors[i].Code);
-            }
-            UI::SameLine();
-            UI::InputText("##" + tostring(i), g_pickedColors[i].Code);
-        }
         if (UI::Button("Add Color"))
         {
             g_pickedColors.InsertLast(ColorCodeData(vec3(1.0, 1.0, 1.0), ""));
@@ -185,6 +172,20 @@ void RenderInterface()
             g_triggerRefresh = true;
         }
         UI::EndDisabled();
+
+        for (uint i = 0; i < g_pickedColors.Length; ++i)
+        {
+            vec3 newColor = UI::InputColor3("Pick Color##" + tostring(i), g_pickedColors[i].Color);
+            if (newColor != g_pickedColors[i].Color) { g_triggerRefresh = true; }
+            g_pickedColors[i].Color = newColor;
+            UI::SameLine();
+            if (UI::Button("Copy##" + tostring(i)))
+            {
+                IO::SetClipboard(g_pickedColors[i].Code);
+            }
+            UI::SameLine();
+            UI::InputText("##" + tostring(i), g_pickedColors[i].Code);
+        }
 
         if (UI::Button("Copy##CodedText"))
         {
