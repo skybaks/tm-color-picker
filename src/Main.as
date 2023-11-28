@@ -64,7 +64,7 @@ string GradientCodedText(vec3 startColor, vec3 endColor, const string&in text, c
     if (letterCount <= 0)
     {
         string code = Hex3ColorCode(startColor);
-        if (code != initLastColorCode)
+        if (letterCount == 0 && code != initLastColorCode)
         {
             return "$" + code + text;
         }
