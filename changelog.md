@@ -1,3 +1,8 @@
+# 1.4.1
+* Change array initialization to work around angelscript issue until the fix is rolled into Openplanet
+* Known issue: Symbol tables do not line break at the right point and there will be a horizontal scroll
+
+
 # 1.4.0
 * Add support for multicolor gradients greater than 2
 

@@ -28,6 +28,16 @@ namespace ColorPicker
             CalculateLength();
         }
 
+        Utf8UnicodeString& opAssign(const Utf8UnicodeString&inout other)
+        {
+            m_string = other.m_string;
+            m_length = 0;
+            m_lastIndexPos = 0;
+            m_lastIndexCount = 0;
+            CalculateLength();
+            return this;
+        }
+
         string get_opIndex(uint index)
         {
             if (index > m_length)
@@ -107,7 +117,7 @@ namespace ColorPicker
         {
             if (size > m_length)
             {
-                throw("Size out of range");
+                throw("Size out of range. size=" + tostring(size) + " m_length=" + tostring(m_length));
             }
 
             uint pos = GetIndexPosition(size);
@@ -126,7 +136,7 @@ namespace ColorPicker
         {
             if (index > m_length)
             {
-                throw("Index out of range");
+                throw("Index out of range. index=" + tostring(index) + " m_length=" + tostring(m_length));
             }
 
             if (index == 0)
