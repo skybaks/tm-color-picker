@@ -1,3 +1,7 @@
+# 1.4.2
+* Fix display of symbols, ImGui is now happy to process Unicode multibyte characters for me
+
+
 # 1.4.1
 * Change array initialization to work around angelscript issue until the fix is rolled into Openplanet
 * Known issue: Symbol tables do not line break at the right point and there will be a horizontal scroll

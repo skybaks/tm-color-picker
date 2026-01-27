@@ -43,34 +43,32 @@ namespace ColorPicker
 
         private void UpdateLineWrapPositions(float regionWidth)
         {
-            Utf8UnicodeString[] unsplitStrings;
+            string[] unsplitStrings;
             unsplitStrings.Resize(3);
-            unsplitStrings[0] = g_symbolsEmojiAndStandard;
-            unsplitStrings[1] = g_symbolsFontAwesome47;
-            unsplitStrings[2] = g_symbolsKenneyIcons;
+            unsplitStrings[0] = tostring(g_symbolsEmojiAndStandard);
+            unsplitStrings[1] = tostring(g_symbolsFontAwesome47);
+            unsplitStrings[2] = tostring(g_symbolsKenneyIcons);
             vec2 framePad = UI::GetStyleVarVec2(UI::StyleVar::FramePadding);
             float wrapLen = regionWidth - (framePad.x * 2.0f);
 
             for (uint symbolIndex = 0; symbolIndex < m_symbolStrings.Length; ++symbolIndex)
             {
                 m_symbolStrings[symbolIndex] = "";
-                int wrapPos = 0;
-                while (wrapPos < int(unsplitStrings[symbolIndex].Length))
+                while (true)
                 {
-                    wrapPos = UI::CalcWordWrapPosition(UI::GetFontSize(), tostring(unsplitStrings[symbolIndex]), wrapLen);
+                    // I think CalcWordWrapPosition was originally not unicode aware so I needed to overlay my Utf8
+                    // string handlers ontop of it. It appears now that it will give me wrap positions that are not
+                    // inside multibyte characters so lets just rely on that.
+                    int wrapPos = UI::CalcWordWrapPosition(UI::GetFontSize(), unsplitStrings[symbolIndex], wrapLen);
                     if (wrapPos >= int(unsplitStrings[symbolIndex].Length))
                     {
-                        m_symbolStrings[symbolIndex] = tostring(unsplitStrings[symbolIndex]);
+                        m_symbolStrings[symbolIndex] += unsplitStrings[symbolIndex];
                         break;
-                    }
-                    else if (wrapPos > 4)
-                    {
-                        uint nextIndex = unsplitStrings[symbolIndex].GetNextCharacterIndex(wrapPos - 4);
-                        m_symbolStrings[symbolIndex] += unsplitStrings[symbolIndex].Pop(nextIndex) + "\n";
                     }
                     else
                     {
-                        break;
+                        m_symbolStrings[symbolIndex] += unsplitStrings[symbolIndex].SubStr(0, wrapPos) + "\n";
+                        unsplitStrings[symbolIndex] = unsplitStrings[symbolIndex].SubStr(wrapPos);
                     }
                 }
             }
